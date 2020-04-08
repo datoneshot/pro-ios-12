@@ -87,3 +87,10 @@ class ViewController : UIViewController {
     }
     
 }
+
+/*
+ Một số lưu ý:
+
+ - Add sublayer vào 1 layer có thể sublayer sẽ có content over bounds của superlayer
+*/
+
