@@ -24,7 +24,7 @@ extension CGVector {
 
 
 class ViewController : UIViewController {
-    @IBOutlet var views: [UIView]!
+    @IBOutlet var views: [UIView]! // mang cac view trong interface builder
     var smilers = [Smiler(), Smiler2()] // to serve as delegates
     
     @discardableResult
@@ -56,15 +56,20 @@ class ViewController : UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+
+        // sort views before use
+        views.sort { $0.tag < $1.tag }
         
         // four ways of getting content into a layer
         
         // 0: delegate draws
-        let lay1 = self.makeLayerOfClass(CALayer.self, andAddToView:0)
+        let lay1 = self.makeLayerOfClass(CALayer.self, andAddToView: 0)
         lay1.isOpaque = true // black background, kaboom
         lay1.delegate = self.smilers[0] as? CALayerDelegate
+        lay1.setValue("layer-0", forKey: "com.datdn4.identifier")
+
         // 1: delegate sets contents
-        let lay2 = self.makeLayerOfClass(CALayer.self, andAddToView:1)
+        let lay2 = self.makeLayerOfClass(CALayer.self, andAddToView: 1)
         // red background of view shows thru from behind
         lay2.delegate = self.smilers[1] as? CALayerDelegate
         // 2: subclass draws
@@ -74,5 +79,21 @@ class ViewController : UIViewController {
 
     }
 
+    // MARK: Refresh manual layer
+    @IBAction func onRefresh(_ sender: UIButton) {
+        let tag = sender.tag
+        let refreshView = views[tag]
+
+        // I can refresh contents of layers from view?
+        refreshView.setNeedsDisplay()
+
+        // get underlayer and manual refresh
+        let identifier = "layer-\(tag)"
+        let refreshLayer = refreshView.layer.sublayers?.filter{ layer in
+            let i = layer.value(forKey: "com.datdn4.identifier") as? String
+            return identifier == i
+        }.first
+        refreshLayer?.setNeedsDisplay()
+    }
 }
 
